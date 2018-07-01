@@ -13,6 +13,7 @@ print(qtdVertices,qtdArestas, qtdDepositos)
 listaVertices = list(range(int(qtdVertices)))
 listaArestas = listarArestas(caminhoArquivo)
 grafo = Grafo(listaVertices,listaArestas)
+print("Arestas: ", grafo.arestas)
 matrizAdj = MatrizAdj(grafo.vertices, grafo.arestas,grafo)
-matriz = floydWarshall(matrizAdj)#modificou a matriz
+matriz = floydWarshall(matrizAdj)
 imprimirMatriz(matrizAdj.matriz)

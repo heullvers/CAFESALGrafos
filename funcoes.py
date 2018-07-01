@@ -19,8 +19,8 @@ def floydWarshall(matrizAdj):
 		for i in range(n):
 			for j in range(n):
 				if(matriz[i][k] != '0' and matriz[k][j] != '0' and i != j):
-					if(int(matriz[i][k]) + int(matriz[k][j]) < int(matriz[i][j]) or (matriz[i][j] == '0')):#se for zero tbm substitui:???????
-						matriz[i][j] = str(int(matriz[i][k]) + int(matriz[k][j]))
+					if(((int(matriz[i][k]) + int(matriz[k][j])) < int(matriz[i][j])) or (matriz[i][j] == '0')):#se for zero tbm substitui:???????
+						matriz[i][j] = (int(matriz[i][k]) + int(matriz[k][j]))
 	return matriz
 
 def geraMA(grafo):
@@ -41,8 +41,8 @@ def geraMA(grafo):
 					if(str(k) == grafo.arestas[j][1]): #se k é igual segundo vértice da ligação
 					#achado os vértices da ligação, em que "i" é a linha da matriz e "k" a coluna, insere-se o peso da aresta na matriz
 						matriz[i][k] = grafo.arestas[j][2]
-					#o grafo não é direcionado, é preciso inserir em dois locais
-						matriz[k][i] = grafo.arestas[j][2]
+			#if([str(i),str(k)] not in grafo.arestas[j][0:1]): # os vertices não estão na lista de arestas, coloca-se um valor muito alto
+			#	matriz[i][k] = '1000'
 	return matriz
 
 def imprimirMatriz(matriz):
