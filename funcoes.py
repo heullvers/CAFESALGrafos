@@ -43,6 +43,13 @@ def geraMA(grafo):
 						matriz[i][k] = grafo.arestas[j][2]
 			#if([str(i),str(k)] not in grafo.arestas[j][0:1]): # os vertices não estão na lista de arestas, coloca-se um valor muito alto
 			#	matriz[i][k] = '1000'
+	
+	#verificando matriz e colocando -1 para arestas que não existem
+	for i in range(tamanhoListaVertices):
+		for j in range(tamanhoListaVertices):
+			if((i != j) and (matriz[i][j] == '0')):
+				print("entrei")
+				matriz[i][j] = -1
 	return matriz
 
 def imprimirMatriz(matriz):
