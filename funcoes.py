@@ -24,20 +24,55 @@ def floydWarshall(matrizAdj):
 	return matriz
 
 
-def escolheDepositos(matrizAdj,p):
-	matriz = matrizAdj.matriz[:]
-	imprimirMatriz(matriz)
+def escolherDepositosMA(matrizAdj,p):
 	n = len(matrizAdj.vertices)
 	#Algoritmo
-	for i in range(p-1):
+	matriz = matrizAdj.matriz[:]	
+	#encontrando menor somatório
+	indiceDoMenor = indiceDoMenorSomatorio(matriz)
+	#copiando as distâncias do primeiro depósito para a lista
+	listaDasMenoresDistancias = matriz[indiceDoMenor][:]
+	#adicionando primeiro depósito à lista
+	listaDeDepositos.append(indiceDoMenor)		
+	for k in range(1,p):
+		matriz = matrizAdj.matriz[:]
 		for i in range(n):
 			if(i not in listaDeDepositos):
 				for j in range(n):
 					matriz[i][j] = matriz[i][j] - listaDasMenoresDistancias[j]
-		#refazer somatório
-		#menor índice
+
+		#refazendo somatório para a nova matriz
+		indiceDoMenor = indiceDoMenorSomatorio(matriz)
+		#adiocinando próximo depósito
 		listaDeDepositos.append(indiceDoMenor)
-					
+		#modificando a lista das menores distâncias
+		for i in range(n):
+			if(matriz[indiceDoMenor][i] < listaDasMenoresDistancias[i]):
+				listaDasMenoresDistancias[i] = matriz[indiceDoMenor][i]
+	return listaDeDepositos
+
+def indiceDoMenorSomatorio(matriz, n):
+	listaSomatorioLinhas = []
+	#somando as linhas da matriz
+	for i in range(n):
+		soma = 0;
+		soma = sum(matriz[i])
+		listaSomatorioLinhas.append(soma) 
+	#encontrando o índice do menor somatório
+	indiceDoMenor = listaSomatorioLinhas.index(min(listaSomatorioLinhas))
+	
+return indiceDoMenor
+
+	
+def retornaListaDaLinhaDoMenorSomatorio(indiceDoMenor, n):
+	listaDaLinhaDoMenorSomatorio = []
+
+	#valores da linha do menor somatório	
+	for j in range(n):
+		listaDaLinhaDoMenorSomatorio.append(matriz[indiceDoMenor][j])  
+	return listaDaLinhaDoMenorSomatorio
+	
+
 def geraMA(grafo):
 	tamanhoListaVertices = len(grafo.vertices)
 	tamanhoListaArestas = len(grafo.arestas)
