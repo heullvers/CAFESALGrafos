@@ -18,8 +18,8 @@ def floydWarshall(matrizAdj):
 	for k in range(n):
 		for i in range(n):
 			for j in range(n):
-				if(matriz[i][k] != '0' and matriz[k][j] != '0' and i != j):
-					if(((int(matriz[i][k]) + int(matriz[k][j])) < int(matriz[i][j])) or (matriz[i][j] == '0')):#se for zero tbm substitui:???????
+				if(int(matriz[i][k]) >= 0 and int(matriz[k][j]) >= 0 and i != j):
+					if(((int(matriz[i][k]) + int(matriz[k][j])) < int(matriz[i][j])) or (int(matriz[i][j]) <= 0)):#se for zero tbm substitui:???????
 						matriz[i][j] = (int(matriz[i][k]) + int(matriz[k][j]))
 	return matriz
 
@@ -41,15 +41,13 @@ def geraMA(grafo):
 					if(str(k) == grafo.arestas[j][1]): #se k é igual segundo vértice da ligação
 					#achado os vértices da ligação, em que "i" é a linha da matriz e "k" a coluna, insere-se o peso da aresta na matriz
 						matriz[i][k] = grafo.arestas[j][2]
-			#if([str(i),str(k)] not in grafo.arestas[j][0:1]): # os vertices não estão na lista de arestas, coloca-se um valor muito alto
-			#	matriz[i][k] = '1000'
 	
 	#verificando matriz e colocando -1 para arestas que não existem
 	for i in range(tamanhoListaVertices):
 		for j in range(tamanhoListaVertices):
 			if((i != j) and (matriz[i][j] == '0')):
 				print("entrei")
-				matriz[i][j] = -1
+				matriz[i][j] = -1 # -1 representa distância infinita, ocorre quando os vértices não possuem ligação diretamente
 	return matriz
 
 def imprimirMatriz(matriz):
