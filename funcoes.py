@@ -20,8 +20,43 @@ def floydWarshall(matrizAdj):
 			for j in range(n):
 				if(int(matriz[i][k]) >= 0 and int(matriz[k][j]) >= 0 and i != j):
 					if(((int(matriz[i][k]) + int(matriz[k][j])) < int(matriz[i][j])) or (int(matriz[i][j]) <= 0)):#se for zero tbm substitui:???????
-						matriz[i][j] = (int(matriz[i][k]) + int(matriz[k][j]))
+						matriz[i][j] = str((int(matriz[i][k]) + int(matriz[k][j])))
 	return matriz
+
+
+def calculaDistanciaLinhas(matrizAdj):
+	#listaSomatorioLinhas[]
+	#indiceDoMenor
+	#listaDaLinhaDoMenorSomatorio[]
+	#listaDeDepositos[]
+
+	listaDeDepositos = []
+	
+	matriz = matrizAdj.matriz
+	imprimirMatriz(matriz)
+	n = len(matrizAdj.vertices)
+	listaSomatorioLinhas = []
+	
+	for i in range(n):
+		soma = 0;
+		for j in range(n):
+			soma += int(matriz[i][j])
+		listaSomatorioLinhas.append(soma) 
+	menor = listaSomatorioLinhas[0]
+	indiceDoMenor = 0
+	
+	for i in range(1,n):
+		if(listaSomatorioLinhas[i] < menor):
+			menor = listaSomatorioLinhas[i]
+			indiceDoMenor = i
+	listaDeDepositos.append(indiceDoMenor)
+	
+	listaDaLinhaDoMenorSomatorio = []	
+	for j in range(n):
+		listaDaLinhaDoMenorSomatorio.append(matriz[indiceDoMenor][j])  	
+	
+	print("Somatorio de cada linha:", listaSomatorioLinhas)
+	print("Linha do menor somatório:", listaDaLinhaDoMenorSomatorio)
 
 def geraMA(grafo):
 	tamanhoListaVertices = len(grafo.vertices)
@@ -46,7 +81,6 @@ def geraMA(grafo):
 	for i in range(tamanhoListaVertices):
 		for j in range(tamanhoListaVertices):
 			if((i != j) and (matriz[i][j] == '0')):
-				print("entrei")
 				matriz[i][j] = -1 # -1 representa distância infinita, ocorre quando os vértices não possuem ligação diretamente
 	return matriz
 
