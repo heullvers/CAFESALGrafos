@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import copy
 def listarArestas(arq):
 	#Para cada linha do arquivo cria uma lista com os vértices pertencentes
 	#à aresta. Ao final  temos como retorno uma lista de listas 
@@ -25,7 +26,7 @@ def floydWarshall(matrizAdj):
 			#percorrendo colunas
 			for j in range(n):
 				#para todo intermediário nas posições [i] [k] e [k] [j que sejam diferentes de 0
-				if(int(matriz[i][k]) >= 0 and int(matriz[k][j]) >= 0 and i != j):
+				if(int(matriz[i][k]) > 0 and int(matriz[k][j]) > 0 and i != j):
 					#se soma do caminho com os intermediários for menor que seguir uma aresta direta
 					# substituir o  valor na posição [i][j]
 					if(((int(matriz[i][k]) + int(matriz[k][j])) < int(matriz[i][j])) or (int(matriz[i][j]) <= 0)):
@@ -38,7 +39,8 @@ def escolherDepositosMA(matrizAdj,p):
 	n = len(matrizAdj.vertices)
 	#lista de depósitos inicialmente vazia
 	listaDeDepositos = []
-	matriz = matrizAdj.matriz[:]
+	#fazendo uma cópia da matriz
+	matriz = copy.deepcopy(matrizAdj.matriz)
 	#encontrando menor somatório
 	indiceDoMenor = indiceDoMenorSomatorio(matriz,n,listaDeDepositos)
 	#copiando as distâncias do primeiro depósito para a lista
@@ -46,22 +48,26 @@ def escolherDepositosMA(matrizAdj,p):
 	#adicionando primeiro depósito à lista
 	listaDeDepositos.append(indiceDoMenor)
 	#zera a coluna referente ao índice do primeiro depósito
-	zerarColuna(matrizAdj.matriz,indiceDoMenor,n)
+	zerarColuna(matriz,indiceDoMenor,n)
 	for k in range(1,p):
 		#para cada iteração é feita uma cópia da matriz de distâncias original
-		matriz = matrizAdj.matriz[:]
+		matrizCopia = copy.deepcopy(matrizAdj.matriz)
+		#print("ORIGINAL")
+		#imprimirMatriz(matrizAdj.matriz)
 		for i in range(n):
 			#realiza a operação para cada linha que ainda não se encontra na lista de depósitos
 			if(i not in listaDeDepositos):
 			#percorre toda a linha atribuindo aos valores a diferença entre as distâncias da própria linha e as distâncias do primeiro depósito
 				for j in range(n):
-					matriz[i][j] = str(int(matriz[i][j]) - int(listaDasMenoresDistancias[j]))
+					matrizCopia[i][j] = str(int(matrizCopia[i][j]) - int(listaDasMenoresDistancias[j]))
+		#print("copia")
+		#imprimirMatriz(matrizCopia)
 		#refazendo somatório para a nova matriz e encontrando a linha com menor somatório que ainda não é um depósito
 		indiceDoMenor = indiceDoMenorSomatorio(matriz,n,listaDeDepositos)
 		#adicinando próximo depósito
 		listaDeDepositos.append(indiceDoMenor)
 		#zera a coluna referente ao índice do novo depósito
-		zerarColuna(matrizAdj.matriz,indiceDoMenor,n)
+		zerarColuna(matriz,indiceDoMenor,n)
 		#modificando a lista das menores distâncias
 		for i in range(n):
 			#se o valor da distância do novo depósito for menor que o valor com mesmo índice na lista, o valor da lista é substituído pelo valor 
@@ -70,9 +76,10 @@ def escolherDepositosMA(matrizAdj,p):
 				listaDasMenoresDistancias[i] = int(matriz[indiceDoMenor][i])
 	return listaDeDepositos
 
+#zera coluna da matriz correspondente ao depósito escolhido
 def zerarColuna(matriz,indice,n):
 	for i in range(n):
-		matriz[i][indice] = 0
+		matriz[i][indice] = '0'
 
 def indiceDoMenorSomatorio(matriz, n,listaDeDepositos):
 	listaSomatorioLinhas = []
@@ -85,14 +92,23 @@ def indiceDoMenorSomatorio(matriz, n,listaDeDepositos):
 	#encontrando o índice do menor somatório
 	indiceDoMenor = listaSomatorioLinhas.index(min(listaSomatorioLinhas))
 	#verificação para não haver repetição de vértices como depósitos
-	#enquanto o indice do menor somatório for de um vértice depósito a distância recebe um valor muito alto e não é mais o menor somatório
+	#enquanto o indice do menor somatório for de um vértice depósito a distância recebe o maior valor da lista e não é mais o menor somatório
 	#o loop se mantém até que se tenha o índice do vértice com menor somatório de distâncias para que seja um novo depósito
 	while(indiceDoMenor in listaDeDepositos):
-		listaSomatorioLinhas[indiceDoMenor] = 1000
+		listaSomatorioLinhas[indiceDoMenor] = max(listaSomatorioLinhas)
+		#print(indiceDoMenor)
 		indiceDoMenor = listaSomatorioLinhas.index(min(listaSomatorioLinhas))
-
 	return indiceDoMenor
 
+#calcular soma total das distâncias
+def calcularSomatorioTotalMA(matrizAdj,listaDeDepositos):
+	n = len(matrizAdj.vertices)
+	soma = 0
+	for i in listaDeDepositos:
+		for j in range(n):
+			soma += int(matrizAdj.matriz[i][j])
+
+	return soma
 
 def geraMA(grafo):
 	qtdVertices = len(grafo.vertices)
@@ -122,7 +138,7 @@ def geraMA(grafo):
 			#todas as posições (exceto a diagonal principal) que ficaram com valor nulo mesmo após a inserção
 			if((i != j) and (matriz[i][j] == '0')):
 				# -1 representa distância infinita, ocorre quando os vértices não possuem ligação diretamente
-				matriz[i][j] = -1 
+				matriz[i][j] = '-1' 
 	return matriz
 
 def imprimirMatriz(matriz):
