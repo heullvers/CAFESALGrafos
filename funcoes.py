@@ -92,7 +92,7 @@ def indiceDoMenorSomatorio(matriz, n,listaDeDepositos):
 	#encontrando o índice do menor somatório
 	indiceDoMenor = listaSomatorioLinhas.index(min(listaSomatorioLinhas))
 	#verificação para não haver repetição de vértices como depósitos
-	#enquanto o indice do menor somatório for de um vértice depósito a distância recebe o maior valor da lista e não é mais o menor somatório
+	#enquanto o indice do menor somatório for de um vértice que já é depósito a distância recebe o maior valor da lista 
 	#o loop se mantém até que se tenha o índice do vértice com menor somatório de distâncias para que seja um novo depósito
 	while(indiceDoMenor in listaDeDepositos):
 		listaSomatorioLinhas[indiceDoMenor] = max(listaSomatorioLinhas)
@@ -103,10 +103,18 @@ def indiceDoMenorSomatorio(matriz, n,listaDeDepositos):
 #calcular soma total das distâncias
 def calcularSomatorioTotalMA(matrizAdj,listaDeDepositos):
 	n = len(matrizAdj.vertices)
+	matriz = copy.deepcopy(matrizAdj.matriz)
 	soma = 0
-	for i in listaDeDepositos:
-		for j in range(n):
-			soma += int(matrizAdj.matriz[i][j])
+	for indice in listaDeDepositos:
+			zerarColuna(matriz,indice,n)
+	for j in range(n):
+		listaMenoresDistanciasCliente = []
+		for i in listaDeDepositos:
+			if(int(matriz[i][j]) >= 0):
+				listaMenoresDistanciasCliente.append(int(matriz[i][j]))
+		
+		print("Menor distância até",j,": ",min(listaMenoresDistanciasCliente))
+		soma += min(listaMenoresDistanciasCliente)
 
 	return soma
 
