@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from grafo import *
 import funcoes
 class MatrizAdj(Grafo):
@@ -5,5 +6,3 @@ class MatrizAdj(Grafo):
 		Grafo.__init__(self,listaVertices, listaArestas)
 		self.grafo = grafo
 		self.matriz = funcoes.geraMA(grafo)
-
-

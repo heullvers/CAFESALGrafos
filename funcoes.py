@@ -1,105 +1,132 @@
+# -*- coding: utf-8 -*-
 def listarArestas(arq):
-	caminhoArquivo = arq
-	arquivo = open(caminhoArquivo,'r')
-	arquivo.readline()
-	lista = []
 	#Para cada linha do arquivo cria uma lista com os vértices pertencentes
 	#à aresta. Ao final  temos como retorno uma lista de listas 
 	#Cada elemento da lista final possui 3 valores(u, v, p) em que
 	#u e v são vértices e p representa o peso da aresta.
+	caminhoArquivo = arq
+	arquivo = open(caminhoArquivo,'r')
+	arquivo.readline()
+	lista = []
+	#percorre arquivo pegando os valor de cada linha (u,v,p)
 	for linha in arquivo:
 			lista.append(linha.split())
 	arquivo.close()
 	return lista
 
+
 def floydWarshall(matrizAdj):
 	matriz = matrizAdj.matriz
+	#n -> quantidade de vértices
 	n = len(matrizAdj.vertices)
 	for k in range(n):
+		#percorrendo linhas
 		for i in range(n):
+			#percorrendo colunas
 			for j in range(n):
+				#para todo intermediário nas posições [i] [k] e [k] [j que sejam diferentes de 0
 				if(int(matriz[i][k]) >= 0 and int(matriz[k][j]) >= 0 and i != j):
+					#se soma do caminho com os intermediários for menor que seguir uma aresta direta
+					# substituir o  valor na posição [i][j]
 					if(((int(matriz[i][k]) + int(matriz[k][j])) < int(matriz[i][j])) or (int(matriz[i][j]) <= 0)):
 						matriz[i][j] = str((int(matriz[i][k]) + int(matriz[k][j])))
 	return matriz
 
 
 def escolherDepositosMA(matrizAdj,p):
+	#n -> quantidade de vértices
 	n = len(matrizAdj.vertices)
-	#Algoritmo
-	matriz = matrizAdj.matriz[:]	
+	#lista de depósitos inicialmente vazia
+	listaDeDepositos = []
+	matriz = matrizAdj.matriz[:]
 	#encontrando menor somatório
-	indiceDoMenor = indiceDoMenorSomatorio(matriz)
+	indiceDoMenor = indiceDoMenorSomatorio(matriz,n,listaDeDepositos)
 	#copiando as distâncias do primeiro depósito para a lista
 	listaDasMenoresDistancias = matriz[indiceDoMenor][:]
 	#adicionando primeiro depósito à lista
-	listaDeDepositos.append(indiceDoMenor)		
+	listaDeDepositos.append(indiceDoMenor)
+	#zera a coluna referente ao índice do primeiro depósito
+	zerarColuna(matrizAdj.matriz,indiceDoMenor,n)
 	for k in range(1,p):
+		#para cada iteração é feita uma cópia da matriz de distâncias original
 		matriz = matrizAdj.matriz[:]
 		for i in range(n):
+			#realiza a operação para cada linha que ainda não se encontra na lista de depósitos
 			if(i not in listaDeDepositos):
+			#percorre toda a linha atribuindo aos valores a diferença entre as distâncias da própria linha e as distâncias do primeiro depósito
 				for j in range(n):
-					matriz[i][j] = matriz[i][j] - listaDasMenoresDistancias[j]
-
-		#refazendo somatório para a nova matriz
-		indiceDoMenor = indiceDoMenorSomatorio(matriz)
-		#adiocinando próximo depósito
+					matriz[i][j] = str(int(matriz[i][j]) - int(listaDasMenoresDistancias[j]))
+		#refazendo somatório para a nova matriz e encontrando a linha com menor somatório que ainda não é um depósito
+		indiceDoMenor = indiceDoMenorSomatorio(matriz,n,listaDeDepositos)
+		#adicinando próximo depósito
 		listaDeDepositos.append(indiceDoMenor)
+		#zera a coluna referente ao índice do novo depósito
+		zerarColuna(matrizAdj.matriz,indiceDoMenor,n)
 		#modificando a lista das menores distâncias
 		for i in range(n):
-			if(matriz[indiceDoMenor][i] < listaDasMenoresDistancias[i]):
-				listaDasMenoresDistancias[i] = matriz[indiceDoMenor][i]
+			#se o valor da distância do novo depósito for menor que o valor com mesmo índice na lista, o valor da lista é substituído pelo valor 
+			#da distância do novo depósito até aquele ponto(representado pelo índice)
+			if(int(matriz[indiceDoMenor][i]) < int(listaDasMenoresDistancias[i])):
+				listaDasMenoresDistancias[i] = int(matriz[indiceDoMenor][i])
 	return listaDeDepositos
 
-def indiceDoMenorSomatorio(matriz, n):
+def zerarColuna(matriz,indice,n):
+	for i in range(n):
+		matriz[i][indice] = 0
+
+def indiceDoMenorSomatorio(matriz, n,listaDeDepositos):
 	listaSomatorioLinhas = []
-	#somando as linhas da matriz
+	#somando as distâncias de cada linha da matriz
 	for i in range(n):
 		soma = 0;
-		soma = sum(matriz[i])
+		for j in range(n):
+			soma += int(matriz[i][j])
 		listaSomatorioLinhas.append(soma) 
 	#encontrando o índice do menor somatório
 	indiceDoMenor = listaSomatorioLinhas.index(min(listaSomatorioLinhas))
-	
-return indiceDoMenor
+	#verificação para não haver repetição de vértices como depósitos
+	#enquanto o indice do menor somatório for de um vértice depósito a distância recebe um valor muito alto e não é mais o menor somatório
+	#o loop se mantém até que se tenha o índice do vértice com menor somatório de distâncias para que seja um novo depósito
+	while(indiceDoMenor in listaDeDepositos):
+		listaSomatorioLinhas[indiceDoMenor] = 1000
+		indiceDoMenor = listaSomatorioLinhas.index(min(listaSomatorioLinhas))
 
-	
-def retornaListaDaLinhaDoMenorSomatorio(indiceDoMenor, n):
-	listaDaLinhaDoMenorSomatorio = []
+	return indiceDoMenor
 
-	#valores da linha do menor somatório	
-	for j in range(n):
-		listaDaLinhaDoMenorSomatorio.append(matriz[indiceDoMenor][j])  
-	return listaDaLinhaDoMenorSomatorio
-	
 
 def geraMA(grafo):
-	tamanhoListaVertices = len(grafo.vertices)
-	tamanhoListaArestas = len(grafo.arestas)
+	qtdVertices = len(grafo.vertices)
+	qtdArestas = len(grafo.arestas)
 	matriz = []
-	#criação de uma matriz quadrada nula, sendo que seu tamanho é estabelecido pela quantidade de vértices
-	for i in range(tamanhoListaVertices): 
+	#criação de uma matriz quadrada nula, sendo que seu tamanho (nxn) é estabelecido pela quantidade de vértices
+	for i in range(qtdVertices): 
 		linha = []
-		for j in range(tamanhoListaVertices):
+		for j in range(qtdVertices):
 			linha.append('0')
 		matriz.append(linha)
-	for i in range(tamanhoListaVertices): #percorrendo lista de vértices
+	#percorrendo lista de vertices
+	for i in range(qtdVertices): 
 		linha = []
-		for j in range(tamanhoListaArestas): #percorrendo lista de arestas 
-			if(str(i) == grafo.arestas[j][0]): #verifica se o vértice pertence a uma ligação de arestas
-				for k in range(tamanhoListaVertices): #caso a afirmativa anterior seja verdadeira é feito um for para achar o segundo vértice da ligação
-					if(str(k) == grafo.arestas[j][1]): #se k é igual segundo vértice da ligação
-					#achado os vértices da ligação, em que "i" é a linha da matriz e "k" a coluna, insere-se o peso da aresta na matriz
+		for j in range(qtdArestas):
+			#verifica se o vértice (u) pertence a alguma aresta (u,v)
+			if(str(i) == grafo.arestas[j][0]):
+				#procura o segundo vertice (v) da aresta (u,v)
+				for k in range(qtdVertices):
+					#como a posição referente à aresta foi encontrada seu peso é inserido na matriz
+					if(str(k) == grafo.arestas[j][1]):
 						matriz[i][k] = grafo.arestas[j][2]
 	
 	#verificando matriz e colocando -1 para arestas que não existem
-	for i in range(tamanhoListaVertices):
-		for j in range(tamanhoListaVertices):
+	for i in range(qtdVertices):
+		for j in range(qtdVertices):
+			#todas as posições (exceto a diagonal principal) que ficaram com valor nulo mesmo após a inserção
 			if((i != j) and (matriz[i][j] == '0')):
-				matriz[i][j] = -1 # -1 representa distância infinita, ocorre quando os vértices não possuem ligação diretamente
+				# -1 representa distância infinita, ocorre quando os vértices não possuem ligação diretamente
+				matriz[i][j] = -1 
 	return matriz
 
 def imprimirMatriz(matriz):
+	#percorre linhas e colunas de uma matriz imprimindo seus valores
 	linhas = len(matriz)
 	if (linhas != 0):
 		colunas = len(matriz[0])
@@ -109,4 +136,3 @@ def imprimirMatriz(matriz):
 			print()
 	else:
 		print("Matriz Vazia")
-
