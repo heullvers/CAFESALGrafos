@@ -148,6 +148,87 @@ def geraMA(grafo):
 				# -1 representa distância infinita, ocorre quando os vértices não possuem ligação diretamente
 				matriz[i][j] = '-1' 
 	return matriz
+#===================================================Adaptar funções de conversão e criação das estruturas===========================================
+#PRECISA VER SE É NECESSARIO MODIFICAR
+#Função que gera uma matriz de incidência a partir de um grafo
+def geraMI(grafo):
+	#FAZER CASO DO LOOP
+	lin = len(grafo.arestas)
+	col = len(grafo.vertices)
+	matriz = []
+	for i in range(lin): #Percorrendo cada aresta
+		linha = []
+		for j in range(col): #Percorrendo cada vertice
+			if str(j) in grafo.arestas[i][:2]: # Verifica se o vertice pertence àquela ligação(aresta, dois primeiros termos (u,v))
+				if grafo.direcionado == False: # Se o grafo for não direcionado os pesos são simplesmente inseridos na matriz
+					linha.append(grafo.arestas[i][2])
+				elif str(j) == grafo.arestas[i][0]: #O peso do vértice de saída do arco se mantêm
+					linha.append(grafo.arestas[i][2])
+				else:
+					linha.append('-' + grafo.arestas[i][2]) # Adiciona sinal negativo ao vértice de chegada do arco
+			else:
+				linha.append('0') # Insere 0 nas colunas dos vértices que não fazem parte da linha(aresta) analisada
+		matriz.append(linha) # Insere cada linha na matriz	
+	return matriz
+#Função que converte uma Matriz de adjacência em uma Matriz de incidência
+def converteMAparaMI(matriz,ehDirecionado, ehPonderado):
+	tamanho = len(matriz)
+	listaVertices = list(range(tamanho))
+	listaArestas = []
+	listaJaInseridos = []
+	for i in range(tamanho):#Para cada posição da matriz verifica se tem uma ligação entre os vértices da posicção i e j
+		for j in range(tamanho):
+			if not ehDirecionado:#Verifica se o grafo é não direcionado
+				if matriz[i][j] != '0' and [str(j),str(i),matriz[i][j]] not in listaJaInseridos:#Verifica se há uma ligação entre os vértices i e j, e se já foi inserida anteriormente 					
+					listaArestas.append([str(i),str(j),matriz[i][j]]) #Insere na lista de arestas no formato (u,v,p)
+					listaJaInseridos.append([str(i),str(j),matriz[i][j]])#Insere na lista as arestas já inseridas, para evitar a repetição de arestas
+			elif matriz[i][j] != '0': #Verifica se tem uma ligação entre os vértices da posição i e j
+					listaArestas.append([str(i),str(j),matriz[i][j]]) #Insere na lista de arestas no formato (u,v,p), sem verificação se a aresta já foi inserida(grafo direcionado)
+	grafo = Grafo(listaVertices, listaArestas, ehDirecionado, ehPonderado) #Cria grafo auxiliar que será a entrada da geraMI
+	return geraMI(grafo)
+
+
+def converteMAparaLA(matriz, ehDirecionado, ehPonderado):
+	
+	qntVertices = len(matriz)
+	listaVertices = list(range(qntVertices))
+	listaArestas = []
+	for i in range(qntVertices):
+		for j in range(qntVertices):
+			if(matriz[i][j] != '0'): # é percorrida toda matriz e ao final é achada a lista de arestas
+				listaArestas.append([str(i),str(j), matriz[i][j]])
+	grafo = Grafo(listaVertices, listaArestas, ehDirecionado, ehPonderado)
+	
+	return geraLA(grafo) #geração da LA por meio do grafo instanciado
+
+
+
+#PRECISA VER SE É NECESSARIO MODIFICAR
+def geraLA(grafo):
+	
+	listaAdjacencia = []
+	for i in range (len(grafo.vertices)):
+		listaAdjacencia.append([])
+
+	
+	dicionario = {}
+	for i in range (len(grafo.vertices)):
+		dicionario[i] = listaAdjacencia[i]
+	
+	listinha1 = []
+	listinha2 = []
+	for i in range(len(grafo.arestas)): #é criado um dicionário, em que cada vértice possui sua chave. Os elementos do dicionário são as arestas
+		listinha1.append(grafo.arestas[i][1])
+		listinha1.append(grafo.arestas[i][2])
+		listaAdjacencia[int(grafo.arestas[i][0])].append(listinha1)
+		if(not grafo.direcionado):
+			listinha2.append(grafo.arestas[i][0])
+			listinha2.append(grafo.arestas[i][2])
+			listaAdjacencia[int(grafo.arestas[i][1])].append(listinha2)
+		listinha1 = []
+		listinha2 = []
+
+	return dicionario
 
 def imprimirMatriz(matriz):
 	#percorre linhas e colunas de uma matriz imprimindo seus valores

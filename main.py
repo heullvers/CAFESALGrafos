@@ -2,7 +2,7 @@
 import copy
 from funcoes import *
 from grafo import *
-from matriz import *
+from matrizAdj import *
 #nomeArquivo = ".txt"
 nomeArquivo = input("Digite o nome do arquivo: ")
 caminhoArquivo = "problemaB/" + nomeArquivo
