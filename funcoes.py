@@ -95,7 +95,6 @@ def indiceDoMenorSomatorioMA(matriz, n,listaDeDepositos):
 	#o loop se mantém até que se tenha o índice do vértice com menor somatório de distâncias para que seja um novo depósito
 	while(indiceDoMenor in listaDeDepositos):
 		listaSomatorioLinhas[indiceDoMenor] = max(listaSomatorioLinhas)
-		#print(indiceDoMenor)
 		indiceDoMenor = listaSomatorioLinhas.index(min(listaSomatorioLinhas))
 	return indiceDoMenor
 
@@ -111,8 +110,6 @@ def calcularSomatorioTotalMA(matrizAdj,listaDeDepositos):
 		for i in listaDeDepositos:
 			if(int(matriz[i][j]) >= 0):
 				listaMenoresDistanciasCliente.append(int(matriz[i][j]))
-		
-		print("Menor distância até",j,": ",min(listaMenoresDistanciasCliente))
 		soma += min(listaMenoresDistanciasCliente)
 
 	return soma
@@ -134,30 +131,24 @@ def escolherDepositosMI(matrizInc,p):
 	listaDeDepositos.append(indiceDoMenor)
 	#zera a linha referente ao índice do primeiro depósito
 	zerarLinhas(matriz,indiceDoMenor,n,m)
-	print("deposito: ",listaDeDepositos)
 	for k in range(1,p):
-		print("k:",k)
 		#para cada iteração é feita uma cópia da matriz de distâncias original
 		matrizCopia = copy.deepcopy(matrizInc.matriz)
 		for j in range(n):
 			#realiza a operação para cada coluna que ainda não se encontra na lista de depósitos
 			if(j not in listaDeDepositos):
-				print(j," não é deposito")
 				#percorre toda a linha atribuindo aos valores a diferença entre as distâncias da própria coluna e as distâncias do primeiro depósito
 				for i in range(m):
-					print("Linha: ",i)
 					matrizCopia[i][j] = str(int(matrizCopia[i][j]) - int(listaDasMenoresDistancias[j]))
 		#refazendo somatório para a nova matriz e encontrando a linha com menor somatório que ainda não é um depósito
 		indiceDoMenor = indiceDoMenorSomatorioMI(matriz,n,m,listaDeDepositos)
 		#adicinando próximo depósito
 		listaDeDepositos.append(indiceDoMenor)
-		print(listaDeDepositos)
 		#zera a coluna referente ao índice do novo depósito
 		zerarLinhas(matriz,indiceDoMenor,n,m)
 		#modificando a lista das menores distâncias
 		for j in range(n):
 			for i in range(m):
-				print("Linha2: ",i)
 				#se o valor da distância do novo depósito for menor que o valor com mesmo índice na lista, o valor da lista é substituído pelo valor 
 				#da distância do novo depósito até aquele ponto(representado pelo índice)
 				if(int(matriz[i][indiceDoMenor]) < int(listaDasMenoresDistancias[j])):
@@ -197,13 +188,14 @@ def calcularSomatorioTotalMI(matrizInc,listaDeDepositos):
 	m = len(matrizInc.arestas)
 	matriz = copy.deepcopy(matrizInc.matriz)
 	soma = 0
-	for j in range(n):
-		if j not in listaDeDepositos:
+	for i in range(n):
+		if( i not in listaDeDepositos):
 			listaMenoresDistanciasCliente = []
-			for i in range(m):
-				if(int(matriz[i][j]) > 0):
+			for j in listaDeDepositos:
+				if(matrizInc.ehVizinho(str(j),str(i))):
 					listaMenoresDistanciasCliente.append(int(matriz[i][j]))
-			soma += min(listaMenoresDistanciasCliente)
+			if(listaMenoresDistanciasCliente != []):
+				soma += min(listaMenoresDistanciasCliente)
 	return soma
 
 
@@ -238,11 +230,9 @@ def geraMA(grafo):
 				# -1 representa distância infinita, ocorre quando os vértices não possuem ligação diretamente
 				matriz[i][j] = '-1' 
 	return matriz
-#===================================================Adaptar funções de conversão e criação das estruturas===========================================
-#PRECISA VER SE É NECESSARIO MODIFICAR
+
 #Função que gera uma matriz de incidência a partir de um grafo
 def geraMI(grafo):
-	#FAZER CASO DO LOOP
 	lin = len(grafo.arestas)
 	col = len(grafo.vertices)
 	matriz = []
@@ -269,11 +259,10 @@ def converteMAparaMI(matriz):
 			if int(matriz[i][j]) > 0 : #Verifica se tem uma ligação entre os vértices da posição i e j
 				listaArestas.append([str(i),str(j),matriz[i][j]]) #Insere na lista de arestas no formato (u,v,p), sem verificação se a aresta já foi inserida(grafo direcionado)
 	grafo = Grafo(listaVertices, listaArestas) #Cria grafo auxiliar que será a entrada da geraMI
-	print("Arestas:",grafo.arestas)
-	print("Vertices:",grafo.vertices)
 	matrizInc = MatrizInc(listaVertices, listaArestas,grafo)
 	return matrizInc
 
+#==========================================================================
 
 def converteMAparaLA(matriz, ehDirecionado, ehPonderado):
 	
@@ -290,7 +279,6 @@ def converteMAparaLA(matriz, ehDirecionado, ehPonderado):
 
 
 
-#PRECISA VER SE É NECESSARIO MODIFICAR
 def geraLA(grafo):
 	
 	listaAdjacencia = []
@@ -316,7 +304,7 @@ def geraLA(grafo):
 		listinha2 = []
 
 	return dicionario
-
+#============================================================================
 def imprimirMatriz(matriz):
 	#percorre linhas e colunas de uma matriz imprimindo seus valores
 	linhas = len(matriz)
