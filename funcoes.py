@@ -54,15 +54,16 @@ def escolherDepositosMA(matrizAdj,p):
 	zerarColuna(matriz,indiceDoMenor,n)
 	for k in range(1,p):
 		#para cada iteração é feita uma cópia da matriz de distâncias original
-		matrizCopia = copy.deepcopy(matrizAdj.matriz)
+		matrizCopia = copy.deepcopy(matriz)
 		for i in range(n):
 			#realiza a operação para cada linha que ainda não se encontra na lista de depósitos
 			if(i not in listaDeDepositos):
 			#percorre toda a linha atribuindo aos valores a diferença entre as distâncias da própria linha e as distâncias do primeiro depósito
 				for j in range(n):
-					matrizCopia[i][j] = str(int(matrizCopia[i][j]) - int(listaDasMenoresDistancias[j]))
+					if(i != j):
+						matrizCopia[i][j] = str(int(matrizCopia[i][j]) - int(listaDasMenoresDistancias[j]))
 		#refazendo somatório para a nova matriz e encontrando a linha com menor somatório que ainda não é um depósito
-		indiceDoMenor = indiceDoMenorSomatorioMA(matriz,n,listaDeDepositos)
+		indiceDoMenor = indiceDoMenorSomatorioMA(matrizCopia,n,listaDeDepositos)
 		#adicinando próximo depósito
 		listaDeDepositos.append(indiceDoMenor)
 		#zera a coluna referente ao índice do novo depósito
